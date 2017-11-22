@@ -1,21 +1,16 @@
 package test;
 
 import lejos.hardware.motor.Motor;
-import lejos.robotics.navigation.DifferentialPilot;
 import lejos.utility.Delay;
 
 public class Robot {
 	
-	DifferentialPilot pilot;
+	//DifferentialPilot pilot;
 	
 	public Robot() {
 		
 		moveForward();
-		this.pilot = new DifferentialPilot(1.5f, 6, Motor.A, Motor.B);
-		for (int i = 0; i < 3; i++) {
-			/*travelAndRotate();*/
-			moveForward();
-		}
+		//this.pilot = new DifferentialPilot(1.5f, 6, Motor.A, Motor.B);
 	}
 	
 	public void moveForward() {
@@ -29,8 +24,8 @@ public class Robot {
 	
 	public void travelAndRotate() {
 		
-		pilot.travel(12);
-		pilot.rotate(90);
+		//pilot.travel(12);
+		//pilot.rotate(90);
 	}
 
 	public static void main(String[] args) {
