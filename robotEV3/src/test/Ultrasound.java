@@ -1,11 +1,15 @@
 package test;
 
+
+
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.LCD;
+import lejos.hardware.motor.Motor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
-import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class Ultrasound {
 	
@@ -17,21 +21,36 @@ public class Ultrasound {
 		Port port = LocalEV3.get().getPort("S2");
 
 		// Get an instance of the Ultrasonic EV3 sensor
-		SensorModes sensor = new EV3UltrasonicSensor(port);
+		EV3UltrasonicSensor sensor = new EV3UltrasonicSensor(port);
 
 		// get an instance of this sensor in measurement mode
-		SampleProvider distance= sensor.getMode("Distance");
+		SampleProvider distance = sensor.getDistanceMode();
 
 		// initialize an array of floats for fetching samples. 
 		// Ask the SampleProvider how long the array should be
 		float[] sample = new float[distance.sampleSize()];
 
 		
-		
 		// fetch a sample
-		while(true) {
-		  distance.fetchSample(sample, 0);
-		  System.out.println(sample);
+		while(Button.ESCAPE.isUp()) {
+			//Button.waitForAnyPress();
+			Delay.msDelay(500);
+			sensor.fetchSample(sample, 0);
+			for (float f : sample) {
+				LCD.drawString("Distance : " + f +  " m", 0, 3);
+			}
 		}
+	}
+	
+	public void forwardBecauseAWall()
+	{
+		Motor.D.forward();
+		Motor.B.forward();
+	}
+	
+	public void stopBecauseNotWall()
+	{
+		Motor.D.stop();
+	 	Motor.B.stop();
 	}
 }
