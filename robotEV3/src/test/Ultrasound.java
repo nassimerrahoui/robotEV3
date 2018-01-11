@@ -15,7 +15,7 @@ public class Ultrasound {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Hello");
+		LCD.drawString("Hello", 0, 3);
 		Button.waitForAnyPress();
 		
 		Port port = LocalEV3.get().getPort("S2");
@@ -33,22 +33,27 @@ public class Ultrasound {
 		
 		// fetch a sample
 		while(Button.ESCAPE.isUp()) {
-			//Button.waitForAnyPress();
 			Delay.msDelay(500);
 			sensor.fetchSample(sample, 0);
 			for (float f : sample) {
 				LCD.drawString("Distance : " + f +  " m", 0, 3);
 			}
+			if(sample[0] >= 0.1) {
+				forward();
+			}else {
+				stop();
+			}
+			
 		}
 	}
 	
-	public void forwardBecauseAWall()
+	public static void forward()
 	{
 		Motor.D.forward();
 		Motor.B.forward();
 	}
 	
-	public void stopBecauseNotWall()
+	public static void stop()
 	{
 		Motor.D.stop();
 	 	Motor.B.stop();
