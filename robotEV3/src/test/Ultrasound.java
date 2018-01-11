@@ -5,10 +5,14 @@ package test;
 import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.LCD;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.motor.Motor;
+import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
+import lejos.robotics.navigation.DifferentialPilot;
 import lejos.utility.Delay;
 
 public class Ultrasound {
@@ -29,11 +33,9 @@ public class Ultrasound {
 		// initialize an array of floats for fetching samples. 
 		// Ask the SampleProvider how long the array should be
 		float[] sample = new float[distance.sampleSize()];
-
 		
 		// fetch a sample
 		while(Button.ESCAPE.isUp()) {
-			Delay.msDelay(500);
 			sensor.fetchSample(sample, 0);
 			for (float f : sample) {
 				LCD.drawString("Distance : " + f +  " m", 0, 3);
@@ -42,6 +44,7 @@ public class Ultrasound {
 				forward();
 			}else {
 				stop();
+				rotate();
 			}
 			
 		}
@@ -56,6 +59,11 @@ public class Ultrasound {
 	public static void stop()
 	{
 		Motor.D.stop();
-	 	Motor.B.stop();
+		Motor.B.stop();
+	}
+	
+	public static void rotate()
+	{
+		Motor.B.rotate(340);
 	}
 }
