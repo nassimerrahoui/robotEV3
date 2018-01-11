@@ -18,9 +18,6 @@ public class RotateHead {
 		m.rotate(90);
 		m.rotate(-180);
 		m.rotate(90);
-		
 		m.close();
 	}
-	
-
 }
