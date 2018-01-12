@@ -9,7 +9,7 @@ public class ChristoGo {
 	
 	public static void main(String[] args) {
 		MovementManager MM = new MovementManager(Motor.B, Motor.D);
-		EnvironmentManager EM = new EnvironmentManager("S2");
+		EnvironmentManager EM = new EnvironmentManager("S2", "A");
 		
 		BlockIO.displayMessage("Yo, I'm Christo");
 		BlockIO.waitUntilPress();
