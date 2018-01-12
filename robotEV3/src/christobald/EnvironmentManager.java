@@ -1,8 +1,9 @@
 package christobald;
 
 import lejos.hardware.ev3.LocalEV3;
-import lejos.hardware.motor.EV3MediumRegulatedMotor;
+import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.Port;
+import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
 
@@ -25,10 +26,11 @@ public class EnvironmentManager {
 	private HeadDirection headPosition;
 	
 	EV3UltrasonicSensor distanceSensor;
-	float[] distanceSample;
-	EV3MediumRegulatedMotor costMotor;
+	EV3TouchSensor pressedSensor;
+	float[] distanceSample, pressedSample;
+	NXTRegulatedMotor neckMotor;
 	
- 	public EnvironmentManager(String DistanceSensorPort, String CostMotorPort) {
+ 	public EnvironmentManager(String DistanceSensorPort, NXTRegulatedMotor a, String PressedSensorPort) {
 		Port portDistance = LocalEV3.get().getPort(DistanceSensorPort);
 		distanceSensor = new EV3UltrasonicSensor(portDistance);
 		SampleProvider distanceProvider = distanceSensor.getDistanceMode();
@@ -36,8 +38,12 @@ public class EnvironmentManager {
 		
 		headPosition = HeadDirection.FRONT;
 		
-		Port portCost = LocalEV3.get().getPort(DistanceSensorPort);
-		costMotor = new EV3MediumRegulatedMotor(portCost);
+		neckMotor = a;
+		
+		Port portPressed = LocalEV3.get().getPort(PressedSensorPort);
+		pressedSensor = new EV3TouchSensor(portPressed);
+		SampleProvider pressedProvider = distanceSensor.getDistanceMode();
+		pressedSample = new float[pressedProvider.sampleSize()];
 	}
 	
 	public float getSensorDistance() {
@@ -47,7 +53,7 @@ public class EnvironmentManager {
 	
 	public void look(HeadDirection direction) {
 		int rotateAngle = direction.getAngle() - this.headPosition.getAngle();
-		costMotor.rotate(rotateAngle);
+		neckMotor.rotate(rotateAngle);
 		this.headPosition = direction;
 	}
 	public float getDistanceOn(HeadDirection direction) {
@@ -63,7 +69,12 @@ public class EnvironmentManager {
 		return (float) 0.2;
 	}
 	public boolean isMoustachePressed() {
-		return false;
+		boolean isPressed = false;
+		pressedSensor.fetchSample(pressedSample, 0);
+		if(pressedSample[0] >= 1)
+			isPressed = true;
+		
+		return isPressed;
 	}
 	public boolean isTailPressed() {
 		return false;

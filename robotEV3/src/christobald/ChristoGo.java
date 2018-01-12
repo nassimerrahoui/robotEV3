@@ -1,16 +1,15 @@
 package christobald;
 
 import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 
 public class ChristoGo {
-	public final static float MIN_FRONT_DISTANCE = (float)0.10;
+	public final static float MIN_FRONT_DISTANCE = (float)0.15;
 	public final static float MAX_FRONT_DISTANCE = (float)0.20;
 	
 	public static void main(String[] args) {
 		MovementManager MM = new MovementManager(Motor.B, Motor.D);
-		EnvironmentManager EM = new EnvironmentManager("S2", "A");
+		EnvironmentManager EM = new EnvironmentManager("S2", Motor.A, "S3");
 		
 		BlockIO.displayMessage("Yo, I'm Christobald");
 		BlockIO.waitUntilPress();
