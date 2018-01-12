@@ -13,7 +13,7 @@ public class MovementManager {
 	
 	@SuppressWarnings("unused")
 	private final static int rotateOffset = 0;
-	private final static int wheelDegreeFor90 = 320;
+	private final static int wheelDegreeFor90 = 270;
 	
 	public MovementManager(NXTRegulatedMotor left, NXTRegulatedMotor right) {
 		this.MotorLeft = left;
@@ -32,8 +32,8 @@ public class MovementManager {
 	
 	public void stop()
 	{
-		MotorLeft.stop();
-		MotorRight.stop();
+		MotorLeft.stop(true);
+		MotorRight.stop(true);
 	}
 	
 	public void rotate(Direction direction) {

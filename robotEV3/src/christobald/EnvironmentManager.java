@@ -12,8 +12,8 @@ public class EnvironmentManager {
 	public final int tailBreakPoint = 2;
 	
 	public enum HeadDirection {
-		  LEFT(-90),
-		  RIGHT(90),
+		  LEFT(90),
+		  RIGHT(-90),
 		  FRONT(0);
 		  private int angle = 0;
 		  HeadDirection(int angle){
