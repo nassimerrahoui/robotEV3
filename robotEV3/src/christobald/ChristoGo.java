@@ -4,8 +4,8 @@ import lejos.hardware.Button;
 import lejos.hardware.motor.Motor;
 
 public class ChristoGo {
-	public final static float MIN_FRONT_DISTANCE = (float)0.15;
-	public final static float MAX_FRONT_DISTANCE = (float)0.20;
+	public final static float MIN_WALL_DISTANCE = (float)0.15;
+	public final static float MAX_WALL_DISTANCE = (float)0.20;
 	
 	public static void main(String[] args) {
 		MovementManager MM = new MovementManager(Motor.B, Motor.D);
@@ -29,16 +29,16 @@ public class ChristoGo {
 		
 		while(Button.ESCAPE.isUp()) {
 			float distance = EM.getDistanceOn(EnvironmentManager.HeadDirection.RIGHT);
-			if(distance <= MAX_FRONT_DISTANCE && distance >= MIN_FRONT_DISTANCE)
+			if(distance <= MAX_WALL_DISTANCE && distance >= MIN_WALL_DISTANCE)
 			{
 				MM.forward();
 			}
-			else if(distance < MIN_FRONT_DISTANCE)
+			else if(distance < MIN_WALL_DISTANCE)
 			{
 				MM.rotate(-20);
 				MM.forward();
 			}
-			else if(distance > MAX_FRONT_DISTANCE)
+			else if(distance > MAX_WALL_DISTANCE)
 			{
 				MM.rotate(20);
 				MM.forward();
