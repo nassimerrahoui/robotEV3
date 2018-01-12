@@ -10,6 +10,7 @@ import lejos.robotics.SampleProvider;
 public class EnvironmentManager {
 	public final int moustacheBreakPoint = 1;
 	public final int tailBreakPoint = 2;
+	private float[] wallDistance;
 	
 	public enum HeadDirection {
 		  LEFT(90),
@@ -39,6 +40,8 @@ public class EnvironmentManager {
 		distanceSample = new float[distanceProvider.sampleSize()];
 		
 		headPosition = HeadDirection.FRONT;
+		wallDistance = new float[100];
+		this.resetWallDistance();
 		
 		neckMotor = a;
 		
@@ -47,7 +50,24 @@ public class EnvironmentManager {
 		SampleProvider moustacheProvider = moustacheSensor.getTouchMode();
 		moustacheSample = new float[moustacheProvider.sampleSize()];
 	}
-	
+	public void resetWallDistance() {
+		for(int i = 0; i < wallDistance.length; i++) {
+			wallDistance[i] = 0;
+		}
+	}
+ 	public int getWallAngleAndReset() {
+ 		float sum = 0;
+ 		int n = 0;
+ 		for(int i = 0; i < wallDistance.length - 1; i++) {
+ 			if(wallDistance[i] !=  0 && wallDistance[i+1] != 0) {
+ 				sum += wallDistance[i] - wallDistance[i+1];
+ 				n++;
+ 			}
+ 		}
+ 		float coefAverage = sum / n;
+ 		resetWallDistance();
+ 		return Math.round( Math.atan((double)coefAverage));
+ 	}
 	public float getSensorDistance() {
 		distanceSensor.fetchSample(distanceSample, 0);
 		return distanceSample[0];
