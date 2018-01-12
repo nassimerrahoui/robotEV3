@@ -23,14 +23,16 @@ public class EnvironmentManager {
 			  return this.angle;
 		  }
 	}
+	
 	private HeadDirection headPosition;
 	
-	EV3UltrasonicSensor distanceSensor;
-	EV3TouchSensor pressedSensor;
-	float[] distanceSample, pressedSample;
 	NXTRegulatedMotor neckMotor;
 	
- 	public EnvironmentManager(String DistanceSensorPort, NXTRegulatedMotor a, String PressedSensorPort) {
+	EV3UltrasonicSensor distanceSensor;
+	EV3TouchSensor moustacheSensor;
+	float[] distanceSample, moustacheSample;
+	
+ 	public EnvironmentManager(String DistanceSensorPort, NXTRegulatedMotor a, String moustacheSensorPort) {
 		Port portDistance = LocalEV3.get().getPort(DistanceSensorPort);
 		distanceSensor = new EV3UltrasonicSensor(portDistance);
 		SampleProvider distanceProvider = distanceSensor.getDistanceMode();
@@ -40,10 +42,10 @@ public class EnvironmentManager {
 		
 		neckMotor = a;
 		
-		Port portPressed = LocalEV3.get().getPort(PressedSensorPort);
-		pressedSensor = new EV3TouchSensor(portPressed);
-		SampleProvider pressedProvider = distanceSensor.getDistanceMode();
-		pressedSample = new float[pressedProvider.sampleSize()];
+		Port portMoustache = LocalEV3.get().getPort(moustacheSensorPort);
+		moustacheSensor = new EV3TouchSensor(portMoustache);
+		SampleProvider moustacheProvider = moustacheSensor.getTouchMode();
+		moustacheSample = new float[moustacheProvider.sampleSize()];
 	}
 	
 	public float getSensorDistance() {
@@ -63,18 +65,14 @@ public class EnvironmentManager {
 	}
 	
 	public float getMoustacheValue() {
-		return (float) 0.2;
+		moustacheSensor.fetchSample(moustacheSample, 0);
+		return moustacheSample[0];
 	}
 	public float getTailValue() {
 		return (float) 0.2;
 	}
 	public boolean isMoustachePressed() {
-		boolean isPressed = false;
-		pressedSensor.fetchSample(pressedSample, 0);
-		if(pressedSample[0] >= 1)
-			isPressed = true;
-		
-		return isPressed;
+		return getMoustacheValue() >= moustacheBreakPoint;
 	}
 	public boolean isTailPressed() {
 		return false;

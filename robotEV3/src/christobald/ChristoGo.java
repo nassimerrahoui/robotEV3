@@ -38,10 +38,17 @@ public class ChristoGo {
 				MM.rotate(-20);
 				MM.forward();
 			}
-			else
+			else if(distance > MAX_FRONT_DISTANCE)
 			{
 				MM.rotate(20);
 				MM.forward();
+			}
+			else if(EM.isMoustachePressed())
+			{
+				MM.backward();
+				MM.backward();
+				MM.backward();
+				MM.rotate(MovementManager.Direction.RIGHT);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ public class MovementManager {
 		  RIGHT
 	}
 	
+	@SuppressWarnings("unused")
 	private final static int rotateOffset = 0;
 	private final static int wheelDegreeFor90 = 320;
 	
