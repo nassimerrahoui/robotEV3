@@ -38,15 +38,14 @@ public class ChristoGo {
 				MM.rotate(-20);
 				MM.forward();
 			}
-			else if(distance > MAX_WALL_DISTANCE)
+			else
 			{
 				MM.rotate(20);
 				MM.forward();
 			}
-			else if(EM.isMoustachePressed())
+			
+			if(EM.isMoustachePressed())
 			{
-				MM.backward();
-				MM.backward();
 				MM.backward();
 				MM.rotate(MovementManager.Direction.RIGHT);
 			}

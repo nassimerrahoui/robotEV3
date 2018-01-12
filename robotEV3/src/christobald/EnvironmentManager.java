@@ -8,7 +8,7 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
 
 public class EnvironmentManager {
-	public final int moustacheBreakPoint = 2;
+	public final int moustacheBreakPoint = 1;
 	public final int tailBreakPoint = 2;
 	
 	public enum HeadDirection {
@@ -72,6 +72,7 @@ public class EnvironmentManager {
 		return (float) 0.2;
 	}
 	public boolean isMoustachePressed() {
+		BlockIO.displayMessage("Moustache : " + getMoustacheValue());
 		return getMoustacheValue() >= moustacheBreakPoint;
 	}
 	public boolean isTailPressed() {
