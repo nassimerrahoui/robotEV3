@@ -6,6 +6,7 @@ import lejos.hardware.lcd.LCD;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class GyroscopeTest {
 	
@@ -24,9 +25,8 @@ public class GyroscopeTest {
 		// fetch a sample
 		while(Button.ESCAPE.isUp()) {
 			gyro.fetchSample(sample, 0);
-			for (float f : sample) {
-				LCD.drawString("Angle : " + f +  " degres", 0, 3);
-			}
+			LCD.drawString("Angle : " + sample[0] +  " degres", 0, 3);
+			
 
 
 		}
