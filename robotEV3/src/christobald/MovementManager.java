@@ -1,6 +1,5 @@
 package christobald;
 
-import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 
 public class MovementManager {
