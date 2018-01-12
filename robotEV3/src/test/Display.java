@@ -9,5 +9,4 @@ public class Display {
 		System.out.println("Hello");
 		Button.waitForAnyPress();
 	}
-
 }
