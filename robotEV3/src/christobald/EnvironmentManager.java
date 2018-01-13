@@ -65,14 +65,10 @@ public class EnvironmentManager {
  		}
  		float coefAverage = sum / n;
  		resetWallDistance();
-<<<<<<< HEAD
  		Long angle = Math.round(Math.atan((double)coefAverage));
  		int i = Integer.valueOf(angle.intValue());
  		
  		return i;
-=======
- 		return (int) Math.round( Math.atan((double)coefAverage));
->>>>>>> branch 'master' of https://github.com/nassimerrahoui/robotEV3
  	}
 	public float getSensorDistance() {
 		distanceSensor.fetchSample(distanceSample, 0);
