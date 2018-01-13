@@ -66,7 +66,10 @@ public class EnvironmentManager {
  		}
  		float coefAverage = sum / n;
  		resetWallDistance();
- 		return Math.round( Math.atan((double)coefAverage));
+ 		Long angle = Math.round(Math.atan((double)coefAverage));
+ 		int i = Integer.valueOf(angle.intValue());
+ 		
+ 		return i;
  	}
 	public float getSensorDistance() {
 		distanceSensor.fetchSample(distanceSample, 0);
