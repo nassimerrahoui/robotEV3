@@ -27,7 +27,7 @@ public class ChristoGo {
 				float distance = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
 				if(distance < MIN_WALL_DISTANCE)
 				{
-					MM.rotate(EM.getWallAngleAndReset());
+					MM.rotate(-1 * EM.getWallAngleAndReset());
 				}
 				else if(distance >= MAX_WALL_DISTANCE)
 				{

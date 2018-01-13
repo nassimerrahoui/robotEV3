@@ -31,15 +31,17 @@ public class EnvironmentManager {
 	EV3UltrasonicSensor distanceSensor;
 	EV3TouchSensor moustacheSensor;
 	float[] distanceSample, moustacheSample;
+	SampleProvider distanceProvider, wallProvider;
 	
  	public EnvironmentManager(String DistanceSensorPort, NXTRegulatedMotor a, String moustacheSensorPort) {
 		Port portDistance = LocalEV3.get().getPort(DistanceSensorPort);
 		distanceSensor = new EV3UltrasonicSensor(portDistance);
-		SampleProvider distanceProvider = distanceSensor.getDistanceMode();
+		distanceProvider = distanceSensor.getDistanceMode();
 		distanceSample = new float[distanceProvider.sampleSize()];
 		
 		headPosition = HeadDirection.FRONT;
-		wallDistance = new float[100];
+		wallProvider = distanceSensor.getDistanceMode();
+		wallDistance = new float[wallProvider.sampleSize()];
 		this.resetWallDistance();
 		
 		neckMotor = a;
@@ -50,23 +52,27 @@ public class EnvironmentManager {
 		moustacheSample = new float[moustacheProvider.sampleSize()];
 	}
 	public void resetWallDistance() {
-		for(int i = 0; i < wallDistance.length; i++) {
+		for(int i = 0; i < wallProvider.sampleSize() - 1; i++) {
 			wallDistance[i] = 0;
 		}
 	}
  	public int getWallAngleAndReset() {
+ 		distanceSensor.fetchSample(wallDistance, wallDistance.length);
  		float sum = 0;
  		int n = 0;
+ 		
  		for(int i = 0; i < wallDistance.length - 1; i++) {
  			if(wallDistance[i] !=  0 && wallDistance[i+1] != 0) {
  				sum += wallDistance[i] - wallDistance[i+1];
  				n++;
  			}
  		}
- 		float coefAverage = sum / n;
+ 		float coefAverage = Math.abs(sum) / n;
  		resetWallDistance();
  		Long angle = Math.round(Math.atan((double)coefAverage));
  		int i = Integer.valueOf(angle.intValue());
+ 		
+ 		System.out.println(i);
  		
  		return i;
  	}
@@ -94,8 +100,7 @@ public class EnvironmentManager {
 		return (float) 0.2;
 	}
 	public boolean isMoustachePressed() {
-		BlockIO.displayMessage("Moustache : " + getMoustacheValue());
-		return getMoustacheValue() == 1;
+		return getMoustacheValue() == 1.0;
 	}
 	public boolean isTailPressed() {
 		return false;
