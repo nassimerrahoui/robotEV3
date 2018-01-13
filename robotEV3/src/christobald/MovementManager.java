@@ -11,8 +11,7 @@ public class MovementManager {
 		  RIGHT
 	}
 	
-	@SuppressWarnings("unused")
-	private final static int rotateOffset = 0;
+	//private final static int rotateOffset = 0;
 	private final static int wheelDegreeFor90 = 270;
 	
 	public MovementManager(NXTRegulatedMotor left, NXTRegulatedMotor right) {
@@ -43,10 +42,10 @@ public class MovementManager {
 			rotate(90);
 	}
 	
-	public void rotate(int degree){
-		int wheelRotateDegree = (int)(Math.round(wheelDegreeFor90 * degree / 90));
+	public void rotate(double degree){
+		int wheelRotateDegree = (int)(wheelDegreeFor90 * degree / 90);
 		if(degree < 0)
-			MotorRight.rotate(-1 * wheelRotateDegree);
+			MotorRight.rotate(- wheelRotateDegree);
 		else
 			MotorLeft.rotate(wheelRotateDegree);
 	}

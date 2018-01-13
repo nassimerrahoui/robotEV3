@@ -1,5 +1,7 @@
 package christobald;
 
+import java.util.ArrayList;
+
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.Port;
@@ -9,7 +11,6 @@ import lejos.robotics.SampleProvider;
 
 public class EnvironmentManager {
 	public final int tailBreakPoint = 2;
-	private float[] wallDistance;
 	
 	public enum HeadDirection {
 		  LEFT(90),
@@ -31,19 +32,18 @@ public class EnvironmentManager {
 	EV3UltrasonicSensor distanceSensor;
 	EV3TouchSensor moustacheSensor;
 	float[] distanceSample, moustacheSample;
+	ArrayList<Float> wallSample;
 	SampleProvider distanceProvider, wallProvider;
 	
  	public EnvironmentManager(String DistanceSensorPort, NXTRegulatedMotor a, String moustacheSensorPort) {
 		Port portDistance = LocalEV3.get().getPort(DistanceSensorPort);
 		distanceSensor = new EV3UltrasonicSensor(portDistance);
 		distanceProvider = distanceSensor.getDistanceMode();
+		
 		distanceSample = new float[distanceProvider.sampleSize()];
+		wallSample = new ArrayList<Float>();
 		
 		headPosition = HeadDirection.FRONT;
-		wallProvider = distanceSensor.getDistanceMode();
-		wallDistance = new float[wallProvider.sampleSize()];
-		this.resetWallDistance();
-		
 		neckMotor = a;
 		
 		Port portMoustache = LocalEV3.get().getPort(moustacheSensorPort);
@@ -51,31 +51,30 @@ public class EnvironmentManager {
 		SampleProvider moustacheProvider = moustacheSensor.getTouchMode();
 		moustacheSample = new float[moustacheProvider.sampleSize()];
 	}
-	public void resetWallDistance() {
-		for(int i = 0; i < wallProvider.sampleSize() - 1; i++) {
-			wallDistance[i] = 0;
-		}
-	}
- 	public int getWallAngleAndReset() {
- 		distanceSensor.fetchSample(wallDistance, wallDistance.length);
+
+ 	public double getWallAngleAndReset() {
  		float sum = 0;
- 		int n = 0;
+ 		int n = wallSample.size() - 1;
  		
- 		for(int i = 0; i < wallDistance.length - 1; i++) {
- 			if(wallDistance[i] !=  0 && wallDistance[i+1] != 0) {
- 				sum += wallDistance[i] - wallDistance[i+1];
- 				n++;
- 			}
+ 		for(int i = 0; i < n ; i++) {
+ 			sum += wallSample.get(i) - wallSample.get(i+1);			
  		}
- 		float coefAverage = Math.abs(sum) / n;
- 		resetWallDistance();
- 		Long angle = Math.round(Math.atan((double)coefAverage));
- 		int i = Integer.valueOf(angle.intValue());
  		
- 		System.out.println(i);
+ 		wallSample.clear();
  		
- 		return i;
+ 		double num = sum * 1000;
+ 		double t = num / n;
+ 		BlockIO.displayMessage(t + " " + n); ///////////////////PROBLEM
+ 		double angle = Math.atan(t);
+ 		return - Math.toDegrees(angle);
  	}
+ 	
+ 	public void addSample() {
+ 		float t = getSensorDistance();
+ 		if(t != 0.0f)
+ 			wallSample.add(t);
+ 	}
+ 	
 	public float getSensorDistance() {
 		distanceSensor.fetchSample(distanceSample, 0);
 		return distanceSample[0];
@@ -86,6 +85,7 @@ public class EnvironmentManager {
 		neckMotor.rotate(rotateAngle);
 		this.headPosition = direction;
 	}
+	
 	public float getDistanceOn(HeadDirection direction) {
 		if(direction != this.headPosition)
 			look(direction);
