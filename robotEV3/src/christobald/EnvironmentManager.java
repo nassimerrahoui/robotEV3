@@ -8,7 +8,6 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
 
 public class EnvironmentManager {
-	public final int moustacheBreakPoint = 1;
 	public final int tailBreakPoint = 2;
 	private float[] wallDistance;
 	
@@ -66,7 +65,7 @@ public class EnvironmentManager {
  		}
  		float coefAverage = sum / n;
  		resetWallDistance();
- 		return Math.round( Math.atan((double)coefAverage));
+ 		return (int) Math.round( Math.atan((double)coefAverage));
  	}
 	public float getSensorDistance() {
 		distanceSensor.fetchSample(distanceSample, 0);
@@ -93,7 +92,7 @@ public class EnvironmentManager {
 	}
 	public boolean isMoustachePressed() {
 		BlockIO.displayMessage("Moustache : " + getMoustacheValue());
-		return getMoustacheValue() >= moustacheBreakPoint;
+		return getMoustacheValue() == 1;
 	}
 	public boolean isTailPressed() {
 		return false;
