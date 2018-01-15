@@ -1,40 +1,36 @@
 package christobald;
 
 import lejos.hardware.Button;
-import lejos.hardware.motor.Motor;
+import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
 
 public class ChristoGoy {
-	public final static float MIN_WALL_DISTANCE = (float)0.10;
-	public final static float MAX_WALL_DISTANCE = (float)0.15;
-	public final static int CORRECTION_ANGLE = 7;
-	public static MovementManager MM = new MovementManager(Motor.B, Motor.D);
-	public static EnvironmentManager EM = new EnvironmentManager("S2", Motor.A, "S3", "S1");
-	
+	public final static float MIN_WALL_DISTANCE = 0.10f;
+	public final static float MAX_WALL_DISTANCE = 0.15f;
+	public final static float NO_WALL_DISTANCE = 0.5f;
+	public final static int CORRECTION_ANGLE = 10;
+	public final static int DELAY_BEFORE_ROTATION = 300;
+	public static MovementManager MM = MovementManager.getInstance();
+	public static EnvironmentManager EM = EnvironmentManager.getInstance();
+	public static ChristoMode mode;
+	 
 	public enum ChristoMode {
 		  WALL_FINDING,
 		  WALL_FOLLOWING,
 		  FORWARD_MOVING,
 		  QUARTER_TURN_AVOIDANCE,
-		  LEFT_CORRECTION,
-		  RIGHT_CORRECTION,
-		  FINISH_LINE
-	}
-	
-	public static void forwardCheck() throws MoustachePressException
-	{
-		if(EM.isMoustachePressed()){
-			//BlockIO.setLedColor(100);
-			throw new MoustachePressException();
-		}
-		MM.forward(); 
+		  FINISH_LINE,
+		  BACK_ESCAPE,
+		  MAD_LEFT_ESCAPE,
+		  MAD_RIGHT_ESCAPE,
+		  MAD_FRONT_ESCAPE
 	}
 	
 	public static void main(String[] args) {
 		
-		BlockIO.displayMessage("Yo, I'm Chri 6.6");
+		BlockIO.displayMessage("Yo, I'm Chris 36");
 		BlockIO.waitUntilPress();
-		ChristoMode mode = ChristoMode.WALL_FINDING;
+		switchMode(ChristoMode.WALL_FINDING);
 		
 		while(Button.ESCAPE.isUp() || EM.isRedColor()) {
 			switch (mode) {
@@ -42,14 +38,13 @@ public class ChristoGoy {
 					MM.stop();
 					float distanceLeft = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
 					float distanceRight = EM.getDistanceOn(EnvironmentManager.HeadDirection.RIGHT);
-					if(distanceLeft > 0.60) {
-						if(distanceRight < distanceLeft)
-							MM.rotate(60);
-						else
-							MM.rotate(-60);
-						mode = ChristoMode.FORWARD_MOVING;
+					if(distanceLeft > NO_WALL_DISTANCE) {
+						MM.rotate(distanceRight < distanceLeft 
+								? MovementManager.Direction.RIGHT 
+								: MovementManager.Direction.LEFT);
+						switchMode(ChristoMode.FORWARD_MOVING);
 					} else {
-						mode = ChristoMode.WALL_FOLLOWING;
+						switchMode(ChristoMode.WALL_FOLLOWING);
 					}
 					EM.look(EnvironmentManager.HeadDirection.LEFT);
 					break;
@@ -58,68 +53,65 @@ public class ChristoGoy {
 					BlockIO.displayMessage("Distance : " + distance);
 					if(distance < MIN_WALL_DISTANCE)
 					{
-						MM.rotate(-1 *CORRECTION_ANGLE);
+						MM.rotate(-CORRECTION_ANGLE);
 					}
-					else if(distance >= MAX_WALL_DISTANCE)
+					else if(distance >= MAX_WALL_DISTANCE && distance <= NO_WALL_DISTANCE)
 					{
-						MM.forward();
-						if(distance < 0.50) {
-							MM.rotate(CORRECTION_ANGLE);
-						}
-						else {
-							MM.forward();
-							Delay.msDelay(800);
-							MM.stop();
-							MM.rotate(-90);
-						}
+						MM.rotate(CORRECTION_ANGLE);
 					}
-					MM.forward(); 
+					else if(distance > NO_WALL_DISTANCE){
+						Delay.msDelay(DELAY_BEFORE_ROTATION);
+						MM.stop();
+						MM.rotate(MovementManager.Direction.LEFT);
+					}
+					MM.forward();
 					if(EM.isMoustachePressed())
-						mode = ChristoMode.QUARTER_TURN_AVOIDANCE;
+						switchMode(ChristoMode.QUARTER_TURN_AVOIDANCE);
 					break;
 				case FORWARD_MOVING:
 					MM.forward();
-					if(EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT) < 0.3)
-						mode = ChristoMode.WALL_FOLLOWING;
+					if(EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT) < NO_WALL_DISTANCE)
+						switchMode(ChristoMode.WALL_FOLLOWING);
 					if(EM.isMoustachePressed())
-						mode = ChristoMode.QUARTER_TURN_AVOIDANCE;
+						switchMode(ChristoMode.QUARTER_TURN_AVOIDANCE);
 					break;
 				case QUARTER_TURN_AVOIDANCE:
 					MM.stop();
 					MM.backward();
-					MM.rotate(60);
+					Delay.msDelay(100);
+					MM.rotate(MovementManager.Direction.RIGHT);
 					MM.stop();
-					mode = ChristoMode.WALL_FOLLOWING;
+					switchMode(ChristoMode.WALL_FOLLOWING);
 					break;
+				case MAD_LEFT_ESCAPE:
+					MM.rotate(MovementManager.Direction.LEFT);
+					switchMode(ChristoMode.MAD_FRONT_ESCAPE);
+				case MAD_RIGHT_ESCAPE:
+					MM.rotate(MovementManager.Direction.RIGHT);
+					switchMode(ChristoMode.MAD_FRONT_ESCAPE);
+				case MAD_FRONT_ESCAPE:
+					MM.forward();
+					if(EM.isMoustachePressed())
+						switchMode(ChristoMode.QUARTER_TURN_AVOIDANCE);
 				default:
 					break;
 			}
-			/**try {
-				
-				float distance = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
-				BlockIO.displayMessage("Distance : " + distance);
-				if(distance < MIN_WALL_DISTANCE)
-				{
-					MM.rotate(-1 *CORRECTION_ANGLE);
-				}
-				else if(distance >= MAX_WALL_DISTANCE)
-				{
-					if(distance < 0.60)
-						MM.rotate(CORRECTION_ANGLE);
-					else
-						MM.stop();
-						MM.forward();
-				}
-				forwardCheck();
-			}
 			
-			catch(MoustachePressException e)
-			{
-				MM.stop();
-				MM.backward();
-				MM.rotate(60);
-			}**/
+			if(MM.isOverRotating()) {
+				if(MM.isLeftOverRotating())
+					switchMode(ChristoMode.MAD_RIGHT_ESCAPE);
+				else
+					switchMode(ChristoMode.MAD_LEFT_ESCAPE);
+			}
+			// FINALLY
+			if(EM.isOverRed())
+				break;
 		}
-		EM.look(EnvironmentManager.HeadDirection.FRONT); 
+		EM.look(EnvironmentManager.HeadDirection.FRONT);
+	}
+	
+	public static void switchMode(ChristoMode m) {
+		mode = m;
+		LCD.drawString("mode: "+m.toString(), 0, 3);
 	}
 }

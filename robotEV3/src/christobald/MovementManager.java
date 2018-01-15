@@ -1,24 +1,49 @@
 package christobald;
 
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
+import lejos.hardware.port.Port;
+import lejos.hardware.sensor.EV3GyroSensor;
+import lejos.robotics.SampleProvider;
 
 public class MovementManager {
-	private NXTRegulatedMotor MotorLeft;
-	private NXTRegulatedMotor MotorRight;
+	private static MovementManager instance = null;
+	
+	private final static NXTRegulatedMotor MotorLeft = Motor.B;
+	private final static NXTRegulatedMotor MotorRight =  Motor.D;
+	private final static int WHEEL_DEGREE_90 = 210;
+	private final static String GYRO_SENSOR_PORT = "S4";
+	private SampleProvider gyroProvider;
+	private float[] gyroSamples;
+	private float gyroCount = 0;
+	public final static int ROTATING_TOLERANCE = 900;
 	
 	public enum Direction {
-		  LEFT,
-		  RIGHT
+		  LEFT(-60),
+		  RIGHT(60);
+		  private int rotationAngle = 0;
+		  Direction(int angle){
+			  this.rotationAngle = angle;
+		  }
+		  public int getAngle(){
+			  return this.rotationAngle;
+		  }
 	}
 	
-	@SuppressWarnings("unused")
-	private final static int rotateOffset = 0;
-	private final static int wheelDegreeFor90 = 210;
-	
-	public MovementManager(NXTRegulatedMotor left, NXTRegulatedMotor right) {
-		this.MotorLeft = left;
-		this.MotorRight = right;
+	public static MovementManager getInstance() {
+		if(instance == null)
+			instance = new MovementManager();
+		return instance;	
 	}
+	private MovementManager() {
+		Port port = LocalEV3.get().getPort(GYRO_SENSOR_PORT);
+		EV3GyroSensor gyro = new EV3GyroSensor(port);
+		gyro.reset();
+		gyroProvider = gyro.getAngleMode();
+		float[] gyroSamples = new float[gyroProvider.sampleSize()];
+	}
+	
 	public void forward()
 	{
 		MotorLeft.forward();
@@ -32,22 +57,35 @@ public class MovementManager {
 	
 	public void stop()
 	{
-		MotorLeft.stop(true);
+		MotorLeft.stop(true); 
 		MotorRight.stop(true);
 	}
 	
 	public void rotate(Direction direction) {
-		if(direction == Direction.LEFT)
-			rotate(-90);
-		else
-			rotate(90);
+		rotate(direction.getAngle());
 	}
 	
 	public void rotate(int degree){
-		int wheelRotateDegree = (int)(Math.round(wheelDegreeFor90 * degree / 90));
+		float degreeBefore = getGyroAngle();
+		int wheelRotateDegree = Math.round(WHEEL_DEGREE_90 * degree / 90);
 		if(degree < 0)
-			MotorRight.rotate(-1 * wheelRotateDegree);
+			MotorRight.rotate(-wheelRotateDegree);
 		else
 			MotorLeft.rotate(wheelRotateDegree);
+		gyroCount += getGyroAngle() - degreeBefore;
+	}
+	
+	public float getGyroAngle() {
+		gyroProvider.fetchSample(gyroSamples, 0);
+		return gyroSamples[0];
+	}
+	public boolean isOverRotating() {
+		return Math.abs(gyroCount) >= ROTATING_TOLERANCE;
+	}
+	public boolean isLeftOverRotating() {
+		return gyroCount < 0;
+	}
+	public void resetGyroCount() {
+		gyroCount = 0;
 	}
 }

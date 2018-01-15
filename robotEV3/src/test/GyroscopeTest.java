@@ -13,7 +13,7 @@ public class GyroscopeTest {
 	
 	public static void main(String[] args) {
 		Port port = LocalEV3.get().getPort("S4");
-
+ 
 		EV3GyroSensor gyro = new EV3GyroSensor(port);
 		
 		gyro.reset();
