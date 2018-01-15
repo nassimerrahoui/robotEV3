@@ -2,6 +2,7 @@ package christobald;
 
 import lejos.hardware.Button;
 import lejos.hardware.motor.Motor;
+import lejos.utility.Delay;
 
 public class ChristoGoy {
 	public final static float MIN_WALL_DISTANCE = (float)0.10;
@@ -30,13 +31,14 @@ public class ChristoGoy {
 	
 	public static void main(String[] args) {
 		
-		BlockIO.displayMessage("Yo, I'm Chri 5.6");
+		BlockIO.displayMessage("Yo, I'm Chri 6.6");
 		BlockIO.waitUntilPress();
 		ChristoMode mode = ChristoMode.WALL_FINDING;
 		
 		while(Button.ESCAPE.isUp()) {
 			switch (mode) {
 				case WALL_FINDING:
+					MM.stop();
 					float distanceLeft = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
 					float distanceRight = EM.getDistanceOn(EnvironmentManager.HeadDirection.RIGHT);
 					if(distanceLeft > 0.60) {
@@ -45,41 +47,41 @@ public class ChristoGoy {
 						else
 							MM.rotate(-60);
 						mode = ChristoMode.FORWARD_MOVING;
-					}else {
+					} else {
 						mode = ChristoMode.WALL_FOLLOWING;
 					}
+					EM.look(EnvironmentManager.HeadDirection.LEFT);
 					break;
 				case WALL_FOLLOWING:
-					try {
-						float distance = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
-						BlockIO.displayMessage("Distance : " + distance);
-						if(distance < MIN_WALL_DISTANCE)
-						{
-							MM.rotate(-1 *CORRECTION_ANGLE);
-						}
-						else if(distance >= MAX_WALL_DISTANCE)
-						{
-							if(distance < 0.60) {
-								MM.rotate(CORRECTION_ANGLE);}
-							else {
-								MM.forward();
-								mode = ChristoMode.WALL_FINDING;
-							}
-						}
-						forwardCheck();
-					}
-					catch(MoustachePressException e)
+					float distance = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
+					BlockIO.displayMessage("Distance : " + distance);
+					if(distance < MIN_WALL_DISTANCE)
 					{
-						mode = ChristoMode.QUARTER_TURN_AVOIDANCE;
+						MM.rotate(-1 *CORRECTION_ANGLE);
 					}
+					else if(distance >= MAX_WALL_DISTANCE)
+					{
+						MM.forward();
+						if(distance < 0.50) {
+							MM.rotate(CORRECTION_ANGLE);
+						}
+						else {
+							MM.forward();
+							Delay.msDelay(800);
+							MM.stop();
+							MM.rotate(-90);
+						}
+					}
+					MM.forward(); 
+					if(EM.isMoustachePressed())
+						mode = ChristoMode.QUARTER_TURN_AVOIDANCE;
 					break;
 				case FORWARD_MOVING:
-					try {
-						forwardCheck();
-					}catch(MoustachePressException e)
-					{
+					MM.forward();
+					if(EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT) < 0.3)
+						mode = ChristoMode.WALL_FOLLOWING;
+					if(EM.isMoustachePressed())
 						mode = ChristoMode.QUARTER_TURN_AVOIDANCE;
-					}
 					break;
 				case QUARTER_TURN_AVOIDANCE:
 					MM.stop();
