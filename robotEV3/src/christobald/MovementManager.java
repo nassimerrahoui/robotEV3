@@ -13,12 +13,12 @@ public class MovementManager {
 	
 	private final static NXTRegulatedMotor MotorLeft = Motor.B;
 	private final static NXTRegulatedMotor MotorRight =  Motor.D;
-	private final static int WHEEL_DEGREE_90 = 210;
+	private final static int WHEEL_DEGREE_90 = 200;
 	private final static String GYRO_SENSOR_PORT = "S4";
 	private SampleProvider gyroProvider;
 	private float[] gyroSamples;
 	private float gyroCount = 0;
-	public final static int ROTATING_TOLERANCE = 900;
+	public final static int ROTATING_TOLERANCE = 600;
 	
 	public enum Direction {
 		  LEFT(-60),
@@ -77,12 +77,13 @@ public class MovementManager {
 	}
 	
 	public float getGyroAngle() {
-		gyroProvider.fetchSample(this.gyroSamples, 0);
+		float[] gyroSamples = new float[gyroProvider.sampleSize()];
+		gyroProvider.fetchSample(gyroSamples, 0);
 		return gyroSamples[0];
 	}
 	public boolean isOverRotating() {
-		LCD.drawString("GC: "+gyroCount, 0, 6);
-		return Math.abs(gyroCount) >= ROTATING_TOLERANCE;
+		LCD.drawString("GC: "+this.gyroCount, 0, 6);
+		return Math.abs(this.gyroCount) >= ROTATING_TOLERANCE;
 	}
 	public boolean isLeftOverRotating() {
 		return gyroCount < 0;

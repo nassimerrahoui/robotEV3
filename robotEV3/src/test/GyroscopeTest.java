@@ -23,7 +23,7 @@ public class GyroscopeTest {
 		// Ask the SampleProvider how long the array should be
 		float[] sample = new float[sample_provider.sampleSize()];
 		
-		Port sensorPort = LocalEV3.get().getPort("S1");            
+		Port sensorPort = LocalEV3.get().getPort("S1");           
 		EV3ColorSensor colorSensor = new EV3ColorSensor(sensorPort);
 		SampleProvider colorIdSensor = colorSensor.getColorIDMode();
 		int sampleSize = colorIdSensor.sampleSize();            

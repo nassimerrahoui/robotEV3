@@ -9,7 +9,7 @@ public class ChristoBoy {
 	public final static float MAX_WALL_DISTANCE = 0.15f;
 	public final static float NO_WALL_DISTANCE = 0.5f;
 	public final static int CORRECTION_ANGLE = 10;
-	public final static int DELAY_BEFORE_ROTATION = 300;
+	public final static int DELAY_BEFORE_ROTATION = 400;
 	public static MovementManager MM = MovementManager.getInstance();
 	public static EnvironmentManager EM = EnvironmentManager.getInstance();
 	public static ChristoMode mode;
@@ -28,7 +28,7 @@ public class ChristoBoy {
 	
 	public static void main(String[] args) {
 		
-		BlockIO.displayMessage("Yo, I'm Chris 36");
+		BlockIO.displayMessage("Yo, I'm Chris 38");
 		BlockIO.waitUntilPress();
 		switchMode(ChristoMode.WALL_FINDING);
 		
@@ -102,6 +102,7 @@ public class ChristoBoy {
 					switchMode(ChristoMode.MAD_RIGHT_ESCAPE);
 				else
 					switchMode(ChristoMode.MAD_LEFT_ESCAPE);
+				MM.resetGyroCount();
 			}
 			// FINALLY
 			if(EM.isOverRed())
