@@ -59,7 +59,7 @@ public class EnvironmentManager {
 		this.headPosition = direction;
 	}
 	public float getDistanceOn(HeadDirection direction) {
-		if(direction != this.headPosition)
+		if(direction != this.headPosition) 
 			look(direction);
 		return getSensorDistance();
 	}
