@@ -3,6 +3,7 @@ package christobald;
 import java.util.LinkedList;
 
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.Port;
@@ -134,6 +135,7 @@ public class EnvironmentManager {
 	}
 	
 	public boolean isRedColor() {
+		LCD.drawString("Col: "+getColor(), 0, 5);
 		return getColor() == 0.00;	
 	}
 }

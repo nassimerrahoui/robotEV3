@@ -1,6 +1,7 @@
 package christobald;
 
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.Port;
@@ -40,7 +41,7 @@ public class MovementManager {
 		Port port = LocalEV3.get().getPort(GYRO_SENSOR_PORT);
 		EV3GyroSensor gyro = new EV3GyroSensor(port);
 		gyro.reset();
-		gyroProvider = gyro.getAngleMode();
+		this.gyroProvider = gyro.getAngleMode();
 		float[] gyroSamples = new float[gyroProvider.sampleSize()];
 	}
 	
@@ -76,10 +77,11 @@ public class MovementManager {
 	}
 	
 	public float getGyroAngle() {
-		gyroProvider.fetchSample(gyroSamples, 0);
+		gyroProvider.fetchSample(this.gyroSamples, 0);
 		return gyroSamples[0];
 	}
 	public boolean isOverRotating() {
+		LCD.drawString("GC: "+gyroCount, 0, 6);
 		return Math.abs(gyroCount) >= ROTATING_TOLERANCE;
 	}
 	public boolean isLeftOverRotating() {
