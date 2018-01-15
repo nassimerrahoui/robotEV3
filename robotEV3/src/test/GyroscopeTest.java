@@ -25,19 +25,16 @@ public class GyroscopeTest {
 		
 		Port sensorPort = LocalEV3.get().getPort("S1");            
 		EV3ColorSensor colorSensor = new EV3ColorSensor(sensorPort);
-		SampleProvider colorRGBSensor = colorSensor.getRGBMode();
-		int sampleSize = colorRGBSensor.sampleSize();            
+		SampleProvider colorIdSensor = colorSensor.getColorIDMode();
+		int sampleSize = colorIdSensor.sampleSize();            
 		float[] sampleColor = new float[sampleSize];
 
 		gyro.reset();
 		// fetch a sample
 		while(Button.ESCAPE.isUp()){
 			sample_provider.fetchSample(sample, 0);
-			colorRGBSensor.fetchSample(sampleColor, 0);
-			//LCD.drawString("A : " + sample[0], 0, 3);
-			LCD.drawString("R : " + sampleColor[0], 0, 3);
-			LCD.drawString("G : " + sampleColor[1], 0, 4);
-			LCD.drawString("B : " + sampleColor[2], 0, 5);
+			colorSensor.fetchSample(sampleColor, 0);
+			LCD.drawString("ID : " + sampleColor[0], 0, 3);
 			Delay.msDelay(10);
 		}
 		//close the sensor

@@ -8,7 +8,7 @@ public class ChristoGoy {
 	public final static float MAX_WALL_DISTANCE = (float)0.15;
 	public final static int CORRECTION_ANGLE = 7;
 	public static MovementManager MM = new MovementManager(Motor.B, Motor.D);
-	public static EnvironmentManager EM = new EnvironmentManager("S2", Motor.A, "S3");
+	public static EnvironmentManager EM = new EnvironmentManager("S2", Motor.A, "S3", "S1");
 	
 	public enum ChristoMode {
 		  WALL_FINDING,
@@ -16,7 +16,8 @@ public class ChristoGoy {
 		  FORWARD_MOVING,
 		  QUARTER_TURN_AVOIDANCE,
 		  LEFT_CORRECTION,
-		  RIGHT_CORRECTION
+		  RIGHT_CORRECTION,
+		  FINISH_LINE
 	}
 	
 	public static void forwardCheck() throws MoustachePressException
@@ -34,7 +35,7 @@ public class ChristoGoy {
 		BlockIO.waitUntilPress();
 		ChristoMode mode = ChristoMode.WALL_FINDING;
 		
-		while(Button.ESCAPE.isUp()) {
+		while(Button.ESCAPE.isUp() || EM.isRedColor()) {
 			switch (mode) {
 				case WALL_FINDING:
 					float distanceLeft = EM.getDistanceOn(EnvironmentManager.HeadDirection.LEFT);
